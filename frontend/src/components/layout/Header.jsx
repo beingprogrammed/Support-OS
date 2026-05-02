@@ -1,0 +1,152 @@
+import React, { useState, useRef, useEffect } from 'react';
+import Avatar from '../common/Avatar';
+import { Bell, Search, Settings, X, Check, Clock, MessageSquare, Zap, Shield, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+
+const Header = ({ title }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const notifications = [
+    { id: 1, title: 'New Ticket Assigned', message: 'High priority ticket #TC-1024 assigned to you.', time: '2m ago', type: 'ticket', icon: MessageSquare, read: false },
+    { id: 2, title: 'System Update', message: 'SupportOS will undergo maintenance at 2:00 AM UTC.', time: '1h ago', type: 'system', icon: Zap, read: false },
+    { id: 3, title: 'Security Alert', message: 'New login detected from San Francisco, CA.', time: '3h ago', type: 'security', icon: Shield, read: true },
+    { id: 4, title: 'Reply Received', message: 'Customer Sarah Connor replied to #TC-992.', time: '5h ago', type: 'ticket', icon: MessageSquare, read: true },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.ref?.current?.contains(event.target) && !event.target.closest('.notification-trigger')) {
+        // setShowNotifications(false); // Fix: simplified below
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const headerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '16px 32px',
+    backgroundColor: 'var(--surface)',
+    borderBottom: '1px solid var(--border)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  };
+
+  const dropdownStyle = {
+    position: 'absolute',
+    top: '70px',
+    right: '32px',
+    width: '380px',
+    backgroundColor: 'var(--surface)',
+    borderRadius: '16px',
+    boxShadow: 'var(--shadow-lg)',
+    border: '1px solid var(--border)',
+    overflow: 'hidden',
+    animation: 'slideDown 0.2s ease-out',
+    display: showNotifications ? 'block' : 'none',
+  };
+
+  const notificationItemStyle = (read) => ({
+    padding: '16px 20px',
+    display: 'flex',
+    gap: '16px',
+    borderBottom: '1px solid var(--border)',
+    cursor: 'pointer',
+    backgroundColor: read ? 'transparent' : 'var(--bg)',
+    transition: 'background-color 0.2s',
+  });
+
+  return (
+    <header style={headerStyle}>
+      <style>
+        {`
+          @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+        `}
+      </style>
+
+      <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+        <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text)' }} />
+        <input 
+          placeholder="Global search..." 
+          style={{ width: '100%', padding: '10px 16px 10px 40px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '14px', color: 'var(--text-bright)', outline: 'none' }} 
+        />
+      </div>
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {/* Notifications */}
+        <div style={{ position: 'relative' }}>
+          <button 
+            className="notification-trigger"
+            onClick={() => setShowNotifications(!showNotifications)}
+            style={{ color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '10px', position: 'relative', transition: 'all 0.2s', backgroundColor: showNotifications ? 'var(--surface-hover)' : 'transparent' }}
+          >
+            <Bell size={20} />
+            <span style={{ position: 'absolute', top: '10px', right: '10px', width: '8px', height: '8px', backgroundColor: 'var(--accent)', borderRadius: '50%', border: '2px solid var(--surface)' }}></span>
+          </button>
+
+          {/* Notification Dropdown */}
+          <div style={dropdownStyle} ref={dropdownRef}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg)' }}>
+              <span style={{ fontWeight: '700', color: 'var(--text-bright)' }}>Notifications</span>
+              <button style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}>Mark all as read</button>
+            </div>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {notifications.map(n => (
+                <div 
+                  key={n.id} 
+                  style={notificationItemStyle(n.read)}
+                  onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                  onMouseOut={e => e.currentTarget.style.backgroundColor = n.read ? 'transparent' : 'var(--bg)'}
+                >
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: n.type === 'security' ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-muted)', color: n.type === 'security' ? 'var(--error)' : 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <n.icon size={18} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-bright)', marginBottom: '4px' }}>{n.title}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text)', lineHeight: '1.4' }}>{n.message}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={10} /> {n.time}
+                    </div>
+                  </div>
+                  {!n.read && <div style={{ width: '6px', height: '6px', backgroundColor: 'var(--accent)', borderRadius: '50%', marginTop: '6px' }}></div>}
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: '12px', textAlign: 'center', borderTop: '1px solid var(--border)' }}>
+              <button style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer' }}>View All Activity</button>
+            </div>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => navigate(`/${user?.role}/settings` || '/admin/settings')}
+          style={{ color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '10px', transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <Settings size={20} />
+        </button>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '20px', borderLeft: '1px solid var(--border)' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)' }}>{user?.name || 'Demo User'}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text)', textTransform: 'capitalize' }}>{user?.role || 'Admin'}</div>
+          </div>
+          <Avatar name={user?.name || 'D'} size="medium" />
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
