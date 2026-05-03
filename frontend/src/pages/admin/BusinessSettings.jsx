@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, Globe, Bell, Lock, Palette, Check, Upload, Moon, Sun, ShieldCheck, Mail, Smartphone, ChevronRight, Zap } from 'lucide-react';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import useNotification from '../../hooks/useNotification';
+import ThemeSelector from '../../components/common/ThemeSelector';
 
 const BusinessSettings = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
   const [accentColor, setAccentColor] = useState('#7c3aed');
   const notification = useNotification();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSave = () => {
     setIsSaving(true);
@@ -16,12 +24,6 @@ const BusinessSettings = () => {
       setIsSaving(false);
       notification.success('Settings saved successfully!');
     }, 1000);
-  };
-
-  const updateThemeColor = (color) => {
-    setAccentColor(color);
-    document.documentElement.style.setProperty('--accent', color);
-    notification.info(`Theme color updated to ${color}`);
   };
 
   const handleAction = (msg) => {
@@ -37,14 +39,16 @@ const BusinessSettings = () => {
 
   const settingsLayoutStyle = {
     display: 'grid',
-    gridTemplateColumns: '260px 1fr',
+    gridTemplateColumns: isMobile ? '1fr' : '260px 1fr',
     gap: '32px',
   };
 
   const sidebarStyle = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: isMobile ? 'row' : 'column',
+    overflowX: isMobile ? 'auto' : 'visible',
     gap: '4px',
+    paddingBottom: isMobile ? '8px' : '0',
   };
 
   const navItemStyle = (isActive) => ({
@@ -59,6 +63,8 @@ const BusinessSettings = () => {
     fontSize: '14px',
     cursor: 'pointer',
     transition: 'all 0.2s',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
   });
 
   return (
@@ -116,47 +122,7 @@ const BusinessSettings = () => {
               <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '700', marginBottom: '8px' }}>Interface Theme</h3>
               <p style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '32px' }}>Customize the look and feel of your workspace.</p>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '40px' }}>
-                <div style={{ padding: '20px', borderRadius: '16px', border: '2px solid var(--accent)', cursor: 'pointer', textAlign: 'center', backgroundColor: '#fff' }}>
-                  <Sun size={24} style={{ color: 'var(--accent)', marginBottom: '12px' }} />
-                  <div style={{ fontWeight: '700', color: '#0f172a' }}>Light Mode</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text)', marginTop: '4px' }}>Active System Theme</div>
-                </div>
-                <div 
-                  onClick={() => notification.warning('Dark mode is coming soon in v2.0!')}
-                  style={{ padding: '20px', borderRadius: '16px', border: '1px solid var(--border)', cursor: 'pointer', textAlign: 'center', backgroundColor: '#0f172a', opacity: 0.7 }}
-                >
-                  <Moon size={24} style={{ color: '#fff', marginBottom: '12px' }} />
-                  <div style={{ fontWeight: '700', color: '#fff' }}>Dark Mode</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>Coming Soon</div>
-                </div>
-              </div>
-
-              <h4 style={{ color: 'var(--text-bright)', fontSize: '14px', fontWeight: '700', marginBottom: '16px' }}>Accent Color</h4>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {['#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'].map(color => (
-                  <div 
-                    key={color}
-                    onClick={() => updateThemeColor(color)}
-                    style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '12px',
-                      backgroundColor: color,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#fff',
-                      transition: 'transform 0.2s',
-                      transform: accentColor === color ? 'scale(1.1)' : 'scale(1)',
-                      boxShadow: accentColor === color ? `0 0 0 3px var(--bg), 0 0 0 5px ${color}` : 'none'
-                    }}
-                  >
-                    {accentColor === color && <Check size={20} />}
-                  </div>
-                ))}
-              </div>
+              <ThemeSelector />
             </div>
           )}
 
@@ -191,7 +157,7 @@ const BusinessSettings = () => {
               <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '700', marginBottom: '8px' }}>Security & Auth</h3>
               <p style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '32px' }}>Manage access control and authentication protocols.</p>
               
-              <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '16px' : '0' }}>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <div style={{ color: 'var(--success)' }}><Shield size={24} /></div>
                   <div>

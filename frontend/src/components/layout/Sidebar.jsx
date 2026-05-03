@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileOpen, closeSidebar }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -119,7 +119,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside style={sidebarStyle}>
+    <aside className={isMobileOpen ? "mobile-open" : ""} style={sidebarStyle}>
       <div style={logoStyle}>
         <div style={{ padding: '6px', borderRadius: '8px', backgroundColor: 'var(--accent)', color: 'white' }}>
           <Zap size={20} fill="currentColor" />
@@ -129,7 +129,7 @@ const Sidebar = () => {
       
       <nav style={navSectionStyle}>
         {getNavItems().map((item) => (
-          <NavLink key={item.path} to={item.path} style={navItemStyle} end>
+          <NavLink key={item.path} to={item.path} style={navItemStyle} end onClick={closeSidebar}>
             <item.icon size={20} />
             {item.label}
           </NavLink>

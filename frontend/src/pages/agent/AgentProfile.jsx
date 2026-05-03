@@ -1,10 +1,18 @@
-import React from 'react';
-import { User, Mail, Phone, Shield, Settings, LogOut, Award, Calendar, CheckCircle, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, Shield, Settings, LogOut, Award, Calendar, CheckCircle, Star, Palette } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
+import ThemeSelector from '../../components/common/ThemeSelector';
 
 const AgentProfile = () => {
   const { user, logout } = useAuth();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const containerStyle = {
     maxWidth: '1000px',
@@ -16,7 +24,7 @@ const AgentProfile = () => {
 
   const profileGridStyle = {
     display: 'grid',
-    gridTemplateColumns: '320px 1fr',
+    gridTemplateColumns: isMobile ? '1fr' : '320px 1fr',
     gap: '24px',
   };
 
@@ -106,7 +114,7 @@ const AgentProfile = () => {
 
   const infoGridStyle = {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
     gap: '24px',
   };
 
@@ -212,7 +220,7 @@ const AgentProfile = () => {
 
           <div style={{ marginTop: '16px' }}>
             <h3 style={sectionTitleStyle}><Award size={20} /> Recent Achievements</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px', marginTop: '12px' }}>
               <div style={achievementCardStyle}>
                 <div style={{ ...iconContainerStyle, backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}>
                   <CheckCircle size={20} />
@@ -231,6 +239,13 @@ const AgentProfile = () => {
                   <div style={{ ...labelStyle, fontSize: '11px' }}>10+ 5-star ratings this week</div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '16px' }}>
+            <h3 style={sectionTitleStyle}><Palette size={20} /> Appearance</h3>
+            <div style={{ marginTop: '12px' }}>
+              <ThemeSelector />
             </div>
           </div>
         </div>

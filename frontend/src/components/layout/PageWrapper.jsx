@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -6,6 +6,8 @@ import useAuth from '../../hooks/useAuth';
 
 const PageWrapper = ({ title }) => {
   const { user } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const layoutStyle = {
     display: 'flex',
     minHeight: '100vh',
@@ -28,9 +30,15 @@ const PageWrapper = ({ title }) => {
 
   return (
     <div style={layoutStyle}>
-      <Sidebar />
+      <Sidebar isMobileOpen={isSidebarOpen} closeSidebar={() => setIsSidebarOpen(false)} />
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 90 }}
+        />
+      )}
       <div style={contentAreaStyle}>
-        <Header title={title} user={user} />
+        <Header title={title} user={user} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <main style={mainStyle} className="animate-fade-in">
           <Outlet />
         </main>

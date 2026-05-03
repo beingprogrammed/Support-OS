@@ -1,11 +1,19 @@
-import React from 'react';
-import { Building2, Users, Database, Globe, ArrowUpRight, ArrowDownRight, Server, Activity, ShieldCheck, Zap, Plus, ExternalLink, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Building2, Users, Database, Globe, ArrowUpRight, ArrowDownRight, Server, Activity, ShieldCheck, Zap, Plus, ExternalLink, MoreVertical, Palette } from 'lucide-react';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import useNotification from '../../hooks/useNotification';
+import ThemeSelector from '../../components/common/ThemeSelector';
 
 const SuperAdminDashboard = () => {
   const notification = useNotification();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const stats = [
     { label: 'Total Tenants', value: '128', icon: Building2, color: 'var(--accent)', trend: '+12%', up: true },
     { label: 'Total Users', value: '12,450', icon: Users, color: '#3b82f6', trend: '+5%', up: true },
@@ -52,7 +60,7 @@ const SuperAdminDashboard = () => {
 
   const mainGridStyle = {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
+    gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
     gap: '24px',
   };
 
@@ -223,6 +231,14 @@ const SuperAdminDashboard = () => {
             <Button variant="outline" fullWidth size="small" style={{ marginTop: '20px' }} onClick={() => notification.info('View All Logs')}>
               View All Security Logs
             </Button>
+          </div>
+
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+              <Palette size={20} style={{ color: 'var(--accent)' }} />
+              <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '600' }}>Appearance</h3>
+            </div>
+            <ThemeSelector />
           </div>
         </div>
       </div>

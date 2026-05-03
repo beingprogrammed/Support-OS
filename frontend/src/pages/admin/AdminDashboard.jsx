@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart3, Users, Ticket, Settings, ArrowUpRight, TrendingUp, Clock, MessageSquare } from 'lucide-react';
 
 const AdminDashboard = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const stats = [
     { label: 'Total Agents', value: '24', icon: Users, color: 'var(--accent)', trend: '+2 this month' },
     { label: 'Active Tickets', value: '142', icon: Ticket, color: '#f59e0b', trend: '-12% from yesterday' },
@@ -68,7 +76,7 @@ const AdminDashboard = () => {
 
   const mainGridStyle = {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
+    gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
     gap: '24px',
   };
 

@@ -1,14 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Avatar from '../common/Avatar';
-import { Bell, Search, Settings, X, Check, Clock, MessageSquare, Zap, Shield, AlertCircle } from 'lucide-react';
+import { Bell, Search, Settings, X, Check, Clock, MessageSquare, Zap, Shield, AlertCircle, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
-const Header = ({ title }) => {
+const Header = ({ title, toggleSidebar }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const notifications = [
     { id: 1, title: 'New Ticket Assigned', message: 'High priority ticket #TC-1024 assigned to you.', time: '2m ago', type: 'ticket', icon: MessageSquare, read: false },
@@ -74,13 +81,38 @@ const Header = ({ title }) => {
         `}
       </style>
 
-      <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
-        <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text)' }} />
-        <input 
-          placeholder="Global search..." 
-          style={{ width: '100%', padding: '10px 16px 10px 40px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '14px', color: 'var(--text-bright)', outline: 'none' }} 
-        />
-      </div>
+      {user?.role !== 'customer' ? (
+        <div style={{ position: 'relative', flex: 1, maxWidth: '400px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {isMobile && (
+            <button 
+              onClick={toggleSidebar}
+              style={{ color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--surface-hover)' }}
+            >
+              <Menu size={20} />
+            </button>
+          )}
+          {!isMobile && (
+            <div style={{ position: 'relative', width: '100%' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text)' }} />
+              <input 
+                placeholder="Global search..." 
+                style={{ width: '100%', padding: '10px 16px 10px 40px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '14px', color: 'var(--text-bright)', outline: 'none' }} 
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+          {isMobile && (
+            <button 
+              onClick={toggleSidebar}
+              style={{ color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--surface-hover)' }}
+            >
+              <Menu size={20} />
+            </button>
+          )}
+        </div>
+      )}
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         {/* Notifications */}
@@ -137,11 +169,13 @@ const Header = ({ title }) => {
           <Settings size={20} />
         </button>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '20px', borderLeft: '1px solid var(--border)' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)' }}>{user?.name || 'Demo User'}</div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', textTransform: 'capitalize' }}>{user?.role || 'Admin'}</div>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px', paddingLeft: isMobile ? '8px' : '20px', borderLeft: isMobile ? 'none' : '1px solid var(--border)' }}>
+          {!isMobile && (
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)' }}>{user?.name || 'Demo User'}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text)', textTransform: 'capitalize' }}>{user?.role || 'Admin'}</div>
+            </div>
+          )}
           <Avatar name={user?.name || 'D'} size="medium" />
         </div>
       </div>

@@ -83,3 +83,100 @@ a {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  /* Common Grid Overrides */
+  div[style*="grid-template-columns"], 
+  div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Specific Flex Wrappers */
+  div[style*="display: flex"][style*="max-width: 1000px"],
+  div[style*="display: flex"][style*="maxWidth: 1000px"],
+  div[style*="display: flex"][style*="max-width: 1200px"],
+  div[style*="display: flex"][style*="maxWidth: 1200px"] {
+    flex-direction: column !important;
+  }
+  
+  /* Flex direction overrides for sections */
+  div[style*="justify-content: space-between"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  /* Keep header rows horizontal */
+  header div[style*="justify-content: space-between"] {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+  
+  /* Navigation Tabs */
+  div[style*="grid-template-columns: 240px 1fr"],
+  div[style*="gridTemplateColumns: 240px 1fr"],
+  div[style*="grid-template-columns: 260px 1fr"],
+  div[style*="gridTemplateColumns: 260px 1fr"],
+  div[style*="grid-template-columns: 320px 1fr"],
+  div[style*="gridTemplateColumns: 320px 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Sidebar */
+  aside {
+    position: fixed !important;
+    left: -100% !important;
+    z-index: 100 !important;
+    transition: left 0.3s ease !important;
+  }
+  aside.mobile-open {
+    left: 0 !important;
+  }
+  
+  /* Generic responsive classes */
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  .responsive-flex-col {
+    flex-direction: column !important;
+  }
+  
+  /* Main Container Padding */
+  main {
+    padding: 16px !important;
+  }
+
+  /* Global Padding reductions */
+  .glass-card {
+    padding: 16px !important;
+  }
+
+  /* Form/Input Overrides */
+  div[style*="display: grid"][style*="1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Header Overrides */
+  .mobile-only-btn {
+    display: flex !important;
+  }
+  
+  header div[style*="text-align: right"] {
+    display: none !important;
+  }
+  
+  /* Typography Scaling */
+  h1 { font-size: 36px !important; }
+  h2 { font-size: 28px !important; }
+  
+  nav {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+    position: relative !important;
+    background: var(--bg) !important;
+  }
+}
+

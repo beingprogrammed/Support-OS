@@ -10,7 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [step, setStep] = useState('login'); // 'login' or 'role-selection'
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  
+
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const notification = useNotification();
@@ -40,7 +40,7 @@ const Login = () => {
       role: role,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${role}`,
     };
-    
+
     localStorage.setItem('supportos_user', JSON.stringify(mockUser));
     // We might need to refresh the page or call a function to update the auth state
     // but for simplicity, we'll just navigate
@@ -196,16 +196,16 @@ const Login = () => {
               <div style={lineStyle}></div>
             </div>
 
-            <Button 
-              variant="outline" 
-              fullWidth 
+            <Button
+              variant="outline"
+              fullWidth
               onClick={handleGoogleLogin}
               loading={isGoogleLoading}
               icon={() => (
-                <img 
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/smartlock/google.svg" 
-                  alt="Google" 
-                  style={{ width: '18px', height: '18px' }} 
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  style={{ width: '18px', height: '18px' }}
                 />
               )}
             >
@@ -226,10 +226,10 @@ const Login = () => {
             <Button variant="outline" onClick={() => handleRoleSelect('superadmin')} icon={Shield}>
               Super Admin
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              fullWidth 
+
+            <Button
+              variant="ghost"
+              fullWidth
               style={{ gridColumn: 'span 2', marginTop: '12px' }}
               onClick={() => setStep('login')}
             >
