@@ -49,7 +49,24 @@ const TenantList = () => {
   const handleCreateTenant = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // Simulate API delay
     setTimeout(() => {
+      const newId = tenants.length > 0 ? Math.max(...tenants.map(t => t.id)) + 1 : 1;
+      const logo = newTenant.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+      
+      const tenantToAdd = {
+        ...newTenant,
+        id: newId,
+        status: 'active',
+        agents: 0,
+        users: 0,
+        logo: logo || '??',
+        mfa: false,
+        sso: false
+      };
+
+      setTenants(prev => [tenantToAdd, ...prev]);
       setIsSubmitting(false);
       setIsCreateModalOpen(false);
       notification.success(`${newTenant.name} has been created successfully!`);
