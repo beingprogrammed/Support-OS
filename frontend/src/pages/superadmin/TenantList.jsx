@@ -17,6 +17,10 @@ const TenantList = () => {
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(5);
+
   const [newTenant, setNewTenant] = useState({
     name: '',
     domain: '',
@@ -37,6 +41,10 @@ const TenantList = () => {
     { id: 4, name: 'Globex', domain: 'globex.supportos.com', plan: 'Free', status: 'suspended', agents: 2, users: 15, logo: 'GX', mfa: false, sso: false },
     { id: 5, name: 'Oscorp', domain: 'oscorp.supportos.com', plan: 'Pro', status: 'active', agents: 25, users: 2100, logo: 'OS', mfa: true, sso: false },
     { id: 6, name: 'Umbrella Corp', domain: 'umbrella.supportos.com', plan: 'Enterprise', status: 'active', agents: 88, users: 4200, logo: 'UC', mfa: true, sso: true },
+    { id: 7, name: 'Hooli', domain: 'hooli.supportos.com', plan: 'Pro', status: 'active', agents: 150, users: 8000, logo: 'HO', mfa: true, sso: true },
+    { id: 8, name: 'Pied Piper', domain: 'piedpiper.supportos.com', plan: 'Free', status: 'active', agents: 4, users: 250, logo: 'PP', mfa: false, sso: false },
+    { id: 9, name: 'Initech', domain: 'initech.supportos.com', plan: 'Pro', status: 'suspended', agents: 8, users: 45, logo: 'IN', mfa: true, sso: false },
+    { id: 10, name: 'Cyberdyne', domain: 'cyberdyne.supportos.com', plan: 'Enterprise', status: 'active', agents: 300, users: 15000, logo: 'CD', mfa: true, sso: true },
   ]);
 
   const filteredTenants = tenants.filter(tenant => {
@@ -45,6 +53,23 @@ const TenantList = () => {
     const matchesStatus = statusFilter === 'all' || tenant.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
+
+  // Calculate Pagination
+  const totalPages = Math.ceil(filteredTenants.length / entriesPerPage);
+  const indexOfLastTenant = currentPage * entriesPerPage;
+  const indexOfFirstTenant = indexOfLastTenant - entriesPerPage;
+  const currentTenants = filteredTenants.slice(indexOfFirstTenant, indexOfLastTenant);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleEntriesChange = (e) => {
+    setEntriesPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   const handleCreateTenant = (e) => {
     e.preventDefault();
@@ -71,6 +96,7 @@ const TenantList = () => {
       setIsCreateModalOpen(false);
       notification.success(`${newTenant.name} has been created successfully!`);
       setNewTenant({ name: '', domain: '', plan: 'Pro', adminEmail: '' });
+      setCurrentPage(1); // Navigate to first page to see the new tenant
     }, 1500);
   };
 
@@ -122,7 +148,7 @@ const TenantList = () => {
               <input 
                 placeholder="Search by tenant name, domain or ID..." 
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 style={{
                   width: '100%',
                   padding: '12px 16px 12px 44px',
@@ -140,7 +166,7 @@ const TenantList = () => {
             {['All', 'Active', 'Suspended'].map((f) => (
               <button
                 key={f}
-                onClick={() => setStatusFilter(f.toLowerCase())}
+                onClick={() => { setStatusFilter(f.toLowerCase()); setCurrentPage(1); }}
                 style={{
                   padding: '8px 16px',
                   borderRadius: '8px',
@@ -161,7 +187,7 @@ const TenantList = () => {
       </div>
 
       <div className="glass-card" style={{ overflow: 'hidden' }}>
-        {filteredTenants.length > 0 ? (
+        {currentTenants.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
@@ -175,7 +201,7 @@ const TenantList = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTenants.map(tenant => (
+                {currentTenants.map(tenant => (
                   <tr key={tenant.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }}>
                     <td style={{ padding: '16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -230,11 +256,51 @@ const TenantList = () => {
             <p style={{ color: 'var(--text)', fontSize: '14px', marginTop: '8px' }}>Try adjusting your search or status filter.</p>
           </div>
         )}
-        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', backgroundColor: 'var(--bg)' }}>
-           <span style={{ fontSize: '13px', color: 'var(--text)' }}>Showing {filteredTenants.length} of {tenants.length} tenants</span>
-           <div style={{ display: 'flex', gap: '8px' }}>
-              <Button variant="outline" size="small" disabled>Previous</Button>
-              <Button variant="outline" size="small" onClick={() => notification.info('Next page')}>Next</Button>
+        <div style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', backgroundColor: 'var(--bg)' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text)' }}>
+                Showing {indexOfFirstTenant + 1} to {Math.min(indexOfLastTenant, filteredTenants.length)} of {filteredTenants.length} tenants
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px', borderLeft: '1px solid var(--border)', paddingLeft: '12px' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text)' }}>Show:</span>
+                <select 
+                  value={entriesPerPage} 
+                  onChange={handleEntriesChange}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border)',
+                    backgroundColor: 'var(--surface)',
+                    color: 'var(--text-bright)',
+                    fontSize: '13px',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </div>
+           </div>
+           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text)', marginRight: '8px' }}>
+                Page {currentPage} of {totalPages || 1}
+              </span>
+              <Button 
+                variant="outline" 
+                size="small" 
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Previous
+              </Button>
+              <Button 
+                variant="outline" 
+                size="small" 
+                disabled={currentPage === totalPages || totalPages === 0}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </Button>
            </div>
         </div>
       </div>
