@@ -6,6 +6,7 @@ import Badge from '../../components/common/Badge';
 import Avatar from '../../components/common/Avatar';
 import Modal from '../../components/common/Modal';
 import useNotification from '../../hooks/useNotification';
+import { exportToPDF } from '../../utils/pdfUtils';
 
 const AgentManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +17,7 @@ const AgentManagement = () => {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [newAgent, setNewAgent] = useState({ name: '', email: '', role: 'Support Agent' });
   const [editForm, setEditForm] = useState({ name: '', email: '', role: 'Support Agent' });
+  const [isExporting, setIsExporting] = useState(false);
   const menuRef = useRef(null);
   const notification = useNotification();
 
@@ -87,6 +89,42 @@ const AgentManagement = () => {
     setAgents(agents.filter(a => a.id !== id));
     notification.success('Agent removed from team.');
     setActiveMenu(null);
+  };
+
+  const handleExport = async () => {
+    if (filteredAgents.length === 0) {
+      notification.warning('No agent data to export.');
+      return;
+    }
+
+    setIsExporting(true);
+    notification.info('Generating PDF report...');
+
+    try {
+      const headers = ['Agent Name', 'Email', 'Role', 'Status', 'Performance'];
+      const rowMapper = (agent) => [
+        agent.name,
+        agent.email,
+        agent.role,
+        agent.status,
+        `${agent.performance}%`
+      ];
+
+      exportToPDF(
+        filteredAgents, 
+        headers, 
+        rowMapper, 
+        'support_agents_report',
+        'Support Agents Performance Report'
+      );
+      
+      notification.success('PDF report exported successfully.');
+    } catch (error) {
+      console.error('Export failed:', error);
+      notification.error('Failed to export PDF report.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const containerStyle = {
@@ -162,7 +200,14 @@ const AgentManagement = () => {
           <p style={{ color: 'var(--text)', fontSize: '14px' }}>Manage and monitor your support team's performance.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <Button variant="outline" icon={Download} onClick={() => notification.info('Exporting agent data...')}>Export</Button>
+          <Button 
+            variant="outline" 
+            icon={Download} 
+            onClick={handleExport}
+            loading={isExporting}
+          >
+            Export PDF
+          </Button>
           <Button variant="primary" icon={UserPlus} onClick={() => setIsAddModalOpen(true)}>Add Agent</Button>
         </div>
       </div>
