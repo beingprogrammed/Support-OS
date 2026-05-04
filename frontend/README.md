@@ -13,6 +13,8 @@ SupportOS is a next-generation support and ticketing platform built with React a
 
 ## 📂 Project Structure
 
+kky
+
 ```text
 src/
 ├── components/
@@ -28,7 +30,7 @@ src/
 │   └── superadmin/ # Platform-wide tenant and analytics management
 ├── hooks/        # Custom logic for Auth, Notifications, and Sockets
 ├── services/     # API integration layer and role-specific services
-├── store/        # Lightweight state management
+├── store/        # Lightweight state managementk
 ├── contexts/     # Global providers (NotificationProvider)
 └── utils/        # Shared constants and helper functions
 ```
@@ -44,11 +46,13 @@ src/
 ## 🚦 Getting Started
 
 1. **Install Dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Run Development Server:**
+
    ```bash
    npm run dev
    ```
