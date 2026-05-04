@@ -11,6 +11,7 @@ const TenantList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState(null);
@@ -21,6 +22,12 @@ const TenantList = () => {
     domain: '',
     plan: 'Pro',
     adminEmail: '',
+  });
+
+  const [editTenant, setEditTenant] = useState({
+    name: '',
+    domain: '',
+    plan: 'Pro',
   });
 
   const [tenants, setTenants] = useState([
@@ -48,6 +55,19 @@ const TenantList = () => {
       notification.success(`${newTenant.name} has been created successfully!`);
       setNewTenant({ name: '', domain: '', plan: 'Pro', adminEmail: '' });
     }, 1500);
+  };
+
+  const handleUpdateTenant = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setTenants(prev => prev.map(t => 
+        t.id === selectedTenant.id ? { ...t, ...editTenant, logo: editTenant.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) } : t
+      ));
+      setIsSubmitting(false);
+      setIsManageModalOpen(false);
+      notification.success(`${editTenant.name} has been updated successfully!`);
+    }, 1000);
   };
 
   const handleSecurityAction = (setting) => {
@@ -177,7 +197,7 @@ const TenantList = () => {
                     </td>
                     <td style={{ padding: '16px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                        <Button variant="ghost" size="small" icon={ExternalLink} onClick={() => notification.info(`Managing ${tenant.name}`)} />
+                        <Button variant="ghost" size="small" icon={ExternalLink} onClick={() => { setSelectedTenant(tenant); setEditTenant({ name: tenant.name, domain: tenant.domain, plan: tenant.plan }); setIsManageModalOpen(true); }} />
                         <Button variant="ghost" size="small" icon={ShieldCheck} onClick={() => { setSelectedTenant(tenant); setIsSecurityModalOpen(true); }} />
                         <Button variant="ghost" size="small" icon={MoreVertical} onClick={() => { setSelectedTenant(tenant); setIsOptionsModalOpen(true); }} />
                       </div>
@@ -261,6 +281,61 @@ const TenantList = () => {
                     {p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: newTenant.plan === p ? 'var(--accent)' : 'var(--text-bright)' }}>{p}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Manage Tenant Modal */}
+      <Modal 
+        isOpen={isManageModalOpen} 
+        onClose={() => setIsManageModalOpen(false)} 
+        title={`Manage Workspace - ${selectedTenant?.name}`}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsManageModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" loading={isSubmitting} onClick={handleUpdateTenant}>Save Changes</Button>
+          </>
+        )}
+      >
+        <form onSubmit={handleUpdateTenant} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <Input 
+            label="Company Name" 
+            value={editTenant.name}
+            onChange={e => setEditTenant({...editTenant, name: e.target.value})}
+            icon={Building2}
+            required
+          />
+          <Input 
+            label="Workspace Domain" 
+            value={editTenant.domain}
+            onChange={e => setEditTenant({...editTenant, domain: e.target.value})}
+            icon={Globe}
+            required
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)', paddingLeft: '4px' }}>Subscription Plan</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {['Pro', 'Enterprise'].map(p => (
+                <div 
+                  key={p}
+                  onClick={() => setEditTenant({...editTenant, plan: p})}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    border: `2px solid ${editTenant.plan === p ? 'var(--accent)' : 'var(--border)'}`,
+                    backgroundColor: editTenant.plan === p ? 'var(--accent-muted)' : 'var(--surface)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px', color: editTenant.plan === p ? 'var(--accent)' : 'var(--text)' }}>
+                    {p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: editTenant.plan === p ? 'var(--accent)' : 'var(--text-bright)' }}>{p}</div>
                 </div>
               ))}
             </div>
