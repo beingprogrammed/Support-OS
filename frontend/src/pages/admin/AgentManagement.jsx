@@ -12,7 +12,10 @@ const AgentManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeMenu, setActiveMenu] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState(null);
   const [newAgent, setNewAgent] = useState({ name: '', email: '', role: 'Support Agent' });
+  const [editForm, setEditForm] = useState({ name: '', email: '', role: 'Support Agent' });
   const menuRef = useRef(null);
   const notification = useNotification();
 
@@ -58,6 +61,18 @@ const AgentManagement = () => {
     setIsAddModalOpen(false);
     setNewAgent({ name: '', email: '', role: 'Support Agent' });
     notification.success(`Agent ${newAgent.name} has been added.`);
+  };
+
+  const handleUpdateAgent = () => {
+    if (!editForm.name || !editForm.email) {
+      notification.error('Please fill in all required fields.');
+      return;
+    }
+    setAgents(agents.map(a => 
+      a.id === selectedAgent.id ? { ...a, ...editForm } : a
+    ));
+    setIsEditModalOpen(false);
+    notification.success(`Details for ${editForm.name} updated.`);
   };
 
   const handleToggleStatus = (id) => {
@@ -296,7 +311,12 @@ const AgentManagement = () => {
                             }
                           `}</style>
                           <button 
-                            onClick={() => { console.log('Edit agent', agent.name); setActiveMenu(null); }}
+                            onClick={() => { 
+                              setSelectedAgent(agent);
+                              setEditForm({ name: agent.name, email: agent.email, role: agent.role });
+                              setIsEditModalOpen(true);
+                              setActiveMenu(null);
+                            }}
                             style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: '8px', background: 'none', border: 'none', color: 'var(--text-bright)', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -336,6 +356,7 @@ const AgentManagement = () => {
         )}
       </div>
 
+      {/* Add Agent Modal */}
       <Modal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
@@ -366,6 +387,47 @@ const AgentManagement = () => {
             <select 
               value={newAgent.role}
               onChange={(e) => setNewAgent({ ...newAgent, role: e.target.value })}
+              style={{ width: '100%', padding: '12px', borderRadius: '10px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-bright)', outline: 'none' }}
+            >
+              <option value="Support Agent">Support Agent</option>
+              <option value="Senior Agent">Senior Agent</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Agent Modal */}
+      <Modal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        title="Edit Agent Details"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleUpdateAgent}>Save Changes</Button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <Input 
+            label="Full Name" 
+            placeholder="e.g. John Doe" 
+            value={editForm.name}
+            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+          />
+          <Input 
+            label="Email Address" 
+            placeholder="e.g. john@supportos.com" 
+            type="email"
+            value={editForm.email}
+            onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+          />
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)', marginBottom: '8px' }}>Role</label>
+            <select 
+              value={editForm.role}
+              onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
               style={{ width: '100%', padding: '12px', borderRadius: '10px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-bright)', outline: 'none' }}
             >
               <option value="Support Agent">Support Agent</option>
