@@ -11,6 +11,9 @@ const TenantList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [newTenant, setNewTenant] = useState({
@@ -20,14 +23,14 @@ const TenantList = () => {
     adminEmail: '',
   });
 
-  const tenants = [
-    { id: 1, name: 'Acme Corp', domain: 'acme.supportos.com', plan: 'Enterprise', status: 'active', agents: 45, users: 1200, logo: 'AC' },
-    { id: 2, name: 'Stark Industries', domain: 'stark.supportos.com', plan: 'Enterprise', status: 'active', agents: 120, users: 5000, logo: 'SI' },
-    { id: 3, name: 'Wayne Ent', domain: 'wayne.supportos.com', plan: 'Pro', status: 'active', agents: 12, users: 800, logo: 'WE' },
-    { id: 4, name: 'Globex', domain: 'globex.supportos.com', plan: 'Free', status: 'suspended', agents: 2, users: 15, logo: 'GX' },
-    { id: 5, name: 'Oscorp', domain: 'oscorp.supportos.com', plan: 'Pro', status: 'active', agents: 25, users: 2100, logo: 'OS' },
-    { id: 6, name: 'Umbrella Corp', domain: 'umbrella.supportos.com', plan: 'Enterprise', status: 'active', agents: 88, users: 4200, logo: 'UC' },
-  ];
+  const [tenants, setTenants] = useState([
+    { id: 1, name: 'Acme Corp', domain: 'acme.supportos.com', plan: 'Enterprise', status: 'active', agents: 45, users: 1200, logo: 'AC', mfa: true, sso: false },
+    { id: 2, name: 'Stark Industries', domain: 'stark.supportos.com', plan: 'Enterprise', status: 'active', agents: 120, users: 5000, logo: 'SI', mfa: true, sso: true },
+    { id: 3, name: 'Wayne Ent', domain: 'wayne.supportos.com', plan: 'Pro', status: 'active', agents: 12, users: 800, logo: 'WE', mfa: false, sso: false },
+    { id: 4, name: 'Globex', domain: 'globex.supportos.com', plan: 'Free', status: 'suspended', agents: 2, users: 15, logo: 'GX', mfa: false, sso: false },
+    { id: 5, name: 'Oscorp', domain: 'oscorp.supportos.com', plan: 'Pro', status: 'active', agents: 25, users: 2100, logo: 'OS', mfa: true, sso: false },
+    { id: 6, name: 'Umbrella Corp', domain: 'umbrella.supportos.com', plan: 'Enterprise', status: 'active', agents: 88, users: 4200, logo: 'UC', mfa: true, sso: true },
+  ]);
 
   const filteredTenants = tenants.filter(tenant => {
     const matchesSearch = tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -45,6 +48,21 @@ const TenantList = () => {
       notification.success(`${newTenant.name} has been created successfully!`);
       setNewTenant({ name: '', domain: '', plan: 'Pro', adminEmail: '' });
     }, 1500);
+  };
+
+  const handleSecurityAction = (setting) => {
+    setTenants(prev => prev.map(t => 
+      t.id === selectedTenant.id ? { ...t, [setting]: !t[setting] } : t
+    ));
+    notification.success(`${setting.toUpperCase()} updated for ${selectedTenant.name}`);
+  };
+
+  const handleStatusChange = (newStatus) => {
+    setTenants(prev => prev.map(t => 
+      t.id === selectedTenant.id ? { ...t, status: newStatus } : t
+    ));
+    setIsOptionsModalOpen(false);
+    notification.success(`${selectedTenant.name} is now ${newStatus}`);
   };
 
   return (
@@ -160,8 +178,8 @@ const TenantList = () => {
                     <td style={{ padding: '16px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
                         <Button variant="ghost" size="small" icon={ExternalLink} onClick={() => notification.info(`Managing ${tenant.name}`)} />
-                        <Button variant="ghost" size="small" icon={ShieldCheck} onClick={() => notification.info(`Security for ${tenant.name}`)} />
-                        <Button variant="ghost" size="small" icon={MoreVertical} onClick={() => notification.info(`Options for ${tenant.name}`)} />
+                        <Button variant="ghost" size="small" icon={ShieldCheck} onClick={() => { setSelectedTenant(tenant); setIsSecurityModalOpen(true); }} />
+                        <Button variant="ghost" size="small" icon={MoreVertical} onClick={() => { setSelectedTenant(tenant); setIsOptionsModalOpen(true); }} />
                       </div>
                     </td>
                   </tr>
@@ -248,6 +266,83 @@ const TenantList = () => {
             </div>
           </div>
         </form>
+      </Modal>
+
+      {/* Security Modal */}
+      <Modal
+        isOpen={isSecurityModalOpen}
+        onClose={() => setIsSecurityModalOpen(false)}
+        title={`Security Settings - ${selectedTenant?.name}`}
+        footer={<Button variant="primary" onClick={() => setIsSecurityModalOpen(false)}>Done</Button>}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontWeight: '600', color: 'var(--text-bright)' }}>Multi-Factor Authentication (MFA)</div>
+              <div style={{ fontSize: '13px', color: 'var(--text)' }}>Require all agents to use MFA</div>
+            </div>
+            <Button 
+              variant={selectedTenant?.mfa ? "primary" : "outline"} 
+              size="small" 
+              onClick={() => handleSecurityAction('mfa')}
+            >
+              {selectedTenant?.mfa ? 'Enabled' : 'Disabled'}
+            </Button>
+          </div>
+          <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontWeight: '600', color: 'var(--text-bright)' }}>Single Sign-On (SSO)</div>
+              <div style={{ fontSize: '13px', color: 'var(--text)' }}>Enable SAML/OIDC authentication</div>
+            </div>
+            <Button 
+              variant={selectedTenant?.sso ? "primary" : "outline"} 
+              size="small" 
+              onClick={() => handleSecurityAction('sso')}
+            >
+              {selectedTenant?.sso ? 'Enabled' : 'Disabled'}
+            </Button>
+          </div>
+          <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+            <div style={{ fontWeight: '600', color: 'var(--text-bright)', marginBottom: '8px' }}>Allowed IP Ranges</div>
+            <div style={{ fontSize: '13px', color: 'var(--text)', marginBottom: '12px' }}>Restrict access to specific IP addresses.</div>
+            <Input placeholder="e.g. 192.168.1.0/24" />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Options Modal */}
+      <Modal
+        isOpen={isOptionsModalOpen}
+        onClose={() => setIsOptionsModalOpen(false)}
+        title={`More Options - ${selectedTenant?.name}`}
+        footer={null}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button 
+            onClick={() => notification.info('Exporting data...')}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--bg)', color: 'var(--text-bright)', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            <ExternalLink size={18} /> Export Tenant Data
+          </button>
+          <button 
+            onClick={() => handleStatusChange(selectedTenant?.status === 'active' ? 'suspended' : 'active')}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--bg)', color: selectedTenant?.status === 'active' ? '#ef4444' : '#10b981', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            <Shield size={18} /> {selectedTenant?.status === 'active' ? 'Suspend Tenant' : 'Activate Tenant'}
+          </button>
+          <button 
+            onClick={() => {
+              if (window.confirm('Are you sure you want to delete this tenant? This action is irreversible.')) {
+                notification.error(`Tenant ${selectedTenant?.name} deleted.`);
+                setTenants(prev => prev.filter(t => t.id !== selectedTenant.id));
+                setIsOptionsModalOpen(false);
+              }
+            }}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #fee2e2', backgroundColor: '#fef2f2', color: '#ef4444', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            <Plus size={18} style={{ transform: 'rotate(45deg)' }} /> Delete Tenant Permanentely
+          </button>
+        </div>
       </Modal>
     </div>
   );
