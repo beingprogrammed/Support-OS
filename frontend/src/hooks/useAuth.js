@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const MOCK_USERS = {
   'admin@supportos.com': { password: 'admin123', name: 'Admin User', role: 'admin' },
   'agent@supportos.com': { password: 'agent123', name: 'Support Agent', role: 'agent' },
-  'customer@supportos.com': { password: 'customer123', name: 'Valued Customer', role: 'customer' },
+  'customer@supportos.com': { password: 'customer123', name: 'John Doe', role: 'customer' },
   'super@supportos.com': { password: 'super123', name: 'Platform Admin', role: 'superadmin' },
 };
 

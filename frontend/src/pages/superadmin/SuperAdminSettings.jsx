@@ -8,7 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import useNotification from '../../hooks/useNotification';
 import ThemeSelector from '../../components/common/ThemeSelector';
 
-const AgentProfile = () => {
+const SuperAdminSettings = () => {
     const { user, logout } = useAuth();
     const notification = useNotification();
 
@@ -37,11 +37,11 @@ const AgentProfile = () => {
     }, []);
 
     const [profile, setProfile] = useState({
-        name: user?.name || 'Jane Smith',
-        email: user?.email || 'jane.smith@supportos.com',
-        phone: '+1 (415) 555-1234',
-        company: 'SupportOS',
-        timezone: 'America/New_York',
+        name: user?.name || 'Platform Admin',
+        email: user?.email || 'super@supportos.com',
+        phone: '+1 (800) 555-1234',
+        company: 'SupportOS Global',
+        timezone: 'UTC',
         language: 'en',
     });
 
@@ -52,17 +52,17 @@ const AgentProfile = () => {
     });
 
     const [preferences, setPreferences] = useState({
-        theme: 'light',
+        theme: 'dark',
         emailNotifications: true,
         pushNotifications: true,
-        ticketUpdates: true,
-        weeklyDigest: true,
+        platformAlerts: true,
+        securityDigests: true,
         soundAlerts: false,
     });
 
     const [sessions] = useState([
         { device: 'Chrome on macOS', location: 'San Francisco, CA', time: 'Current session', current: true },
-        { device: 'Safari on iPhone', location: 'San Francisco, CA', time: '2 hours ago', current: false },
+        { device: 'Terminal SSH', location: 'AWS EU-West', time: '2 hours ago', current: false },
     ]);
 
     const handleSave = (section) => {
@@ -213,7 +213,7 @@ const AgentProfile = () => {
                     <div>
                         <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-bright)' }}>{profile.name}</div>
                         <div style={{ fontSize: '14px', color: 'var(--text)', marginTop: '4px' }}>{profile.email}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: '600', marginTop: '8px', textTransform: 'capitalize' }}>Agent Account</div>
+                        <div style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: '600', marginTop: '8px', textTransform: 'capitalize' }}>SuperAdmin Account</div>
                     </div>
                 </div>
             </div>
@@ -224,12 +224,13 @@ const AgentProfile = () => {
                     <Input label="Full Name" value={profile.name} onChange={e => { setProfile({ ...profile, name: e.target.value }); setErrors({ ...errors, name: null }); }} icon={User} error={errors.name} />
                     <Input label="Email Address" type="email" value={profile.email} onChange={e => { setProfile({ ...profile, email: e.target.value }); setErrors({ ...errors, email: null }); }} error={errors.email} />
                     <Input label="Phone Number" value={profile.phone} onChange={e => { setProfile({ ...profile, phone: e.target.value }); setErrors({ ...errors, phone: null }); }} error={errors.phone} />
-                    <Input label="Department" value={profile.company} onChange={e => setProfile({ ...profile, company: e.target.value })} />
+                    <Input label="Organization" value={profile.company} onChange={e => setProfile({ ...profile, company: e.target.value })} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px', marginTop: '4px' }}>
                     <div>
                         <label style={labelStyle}>Timezone</label>
                         <select style={selectStyle} value={profile.timezone} onChange={e => setProfile({ ...profile, timezone: e.target.value })}>
+                            <option value="UTC">Coordinated Universal Time (UTC)</option>
                             <option value="America/New_York">Eastern Time (ET)</option>
                             <option value="America/Chicago">Central Time (CT)</option>
                             <option value="America/Denver">Mountain Time (MT)</option>
@@ -302,11 +303,12 @@ const AgentProfile = () => {
             </div>
 
             <div className="glass-card" style={{ padding: '32px' }}>
-                <h4 style={sectionTitleStyle}>Notification Preferences</h4>
-                <Toggle checked={preferences.emailNotifications} onChange={() => setPreferences({ ...preferences, emailNotifications: !preferences.emailNotifications })} label="Email Notifications" description="Receive email notifications for ticket assignments." />
-                <Toggle checked={preferences.pushNotifications} onChange={() => setPreferences({ ...preferences, pushNotifications: !preferences.pushNotifications })} label="Push Notifications" description="Get browser push notifications for real-time updates." />
-                <Toggle checked={preferences.ticketUpdates} onChange={() => setPreferences({ ...preferences, ticketUpdates: !preferences.ticketUpdates })} label="Ticket Status Updates" description="Get notified when a customer replies." />
-                <Toggle checked={preferences.soundAlerts} onChange={() => setPreferences({ ...preferences, soundAlerts: !preferences.soundAlerts })} label="Sound Alerts" description="Play a sound when new messages arrive." />
+                <h4 style={sectionTitleStyle}>Platform Notifications</h4>
+                <Toggle checked={preferences.emailNotifications} onChange={() => setPreferences({ ...preferences, emailNotifications: !preferences.emailNotifications })} label="Email Notifications" description="Receive email notifications for critical platform events." />
+                <Toggle checked={preferences.pushNotifications} onChange={() => setPreferences({ ...preferences, pushNotifications: !preferences.pushNotifications })} label="Push Notifications" description="Get browser push notifications for real-time alerts." />
+                <Toggle checked={preferences.platformAlerts} onChange={() => setPreferences({ ...preferences, platformAlerts: !preferences.platformAlerts })} label="Platform Status Alerts" description="Get notified when platform health status changes." />
+                <Toggle checked={preferences.securityDigests} onChange={() => setPreferences({ ...preferences, securityDigests: !preferences.securityDigests })} label="Security Digests" description="Receive periodic summaries of security events." />
+                <Toggle checked={preferences.soundAlerts} onChange={() => setPreferences({ ...preferences, soundAlerts: !preferences.soundAlerts })} label="Sound Alerts" description="Play a sound when urgent platform alerts arrive." />
             </div>
         </div>
     );
@@ -314,8 +316,8 @@ const AgentProfile = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <div>
-                <h2 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-bright)', marginBottom: '4px' }}>Agent Profile</h2>
-                <p style={{ color: 'var(--text)', fontSize: '15px' }}>Manage your agent preferences and security.</p>
+                <h2 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-bright)', marginBottom: '4px' }}>SuperAdmin Settings</h2>
+                <p style={{ color: 'var(--text)', fontSize: '15px' }}>Manage your global administrative account preferences and security.</p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '240px 1fr', gap: '32px' }}>
@@ -354,4 +356,4 @@ const AgentProfile = () => {
     );
 };
 
-export default AgentProfile;
+export default SuperAdminSettings;

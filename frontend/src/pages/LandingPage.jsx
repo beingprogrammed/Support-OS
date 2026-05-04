@@ -25,12 +25,18 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleScrollEvent = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScrollEvent);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScrollEvent);
+    };
   }, []);
 
   const theme = {
@@ -97,23 +103,30 @@ const LandingPage = () => {
     e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)';
   };
 
+  const headerStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 50,
+    backgroundColor: isScrolled || isMobile ? 'rgba(249, 250, 251, 0.9)' : 'transparent',
+    backdropFilter: isScrolled || isMobile ? 'blur(8px)' : 'none',
+    borderBottom: isScrolled ? `1px solid ${theme.border}` : '1px solid transparent',
+    transition: 'all 0.3s ease',
+  };
+
   const navStyle = {
     display: 'flex',
     flexDirection: isMobile ? 'column' : 'row',
     gap: isMobile ? '16px' : '0',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: isMobile ? '16px' : '24px 48px',
+    padding: isMobile ? '16px' : (isScrolled ? '16px 48px' : '24px 48px'),
     maxWidth: '1200px',
     margin: '0 auto',
     width: '100%',
     boxSizing: 'border-box',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: isMobile ? theme.bg : 'transparent',
+    transition: 'all 0.3s ease',
   };
 
   const linkStyle = {
@@ -133,43 +146,45 @@ const LandingPage = () => {
 
   return (
     <div style={containerStyle}>
-      {/* NAVBAR */}
-      <nav style={navStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: theme.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-            <Zap size={16} />
+      {/* HEADER */}
+      <header style={headerStyle}>
+        <nav style={navStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: theme.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+              <Zap size={16} />
+            </div>
+            <span style={{ fontWeight: '800', color: theme.text, fontSize: '18px', letterSpacing: '-0.02em' }}>SupportOS</span>
           </div>
-          <span style={{ fontWeight: '800', color: theme.text, fontSize: '18px', letterSpacing: '-0.02em' }}>SupportOS</span>
-        </div>
-        
-        <div style={{ display: isMobile ? 'none' : 'flex', gap: '32px', alignItems: 'center' }}>
-          <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('problem')}>Problem</button>
-          <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('solution')}>Solution</button>
-          <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('features')}>Features</button>
-        </div>
+          
+          <div style={{ display: isMobile ? 'none' : 'flex', gap: '32px', alignItems: 'center' }}>
+            <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('problem')}>Problem</button>
+            <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('solution')}>Solution</button>
+            <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => handleScroll('features')}>Features</button>
+          </div>
 
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => navigate('/login')}>Sign in</button>
-          <button 
-            onClick={() => navigate('/login')}
-            style={{
-              backgroundColor: theme.text,
-              color: 'white',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            Get Started
-          </button>
-        </div>
-      </nav>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <button style={linkStyle} onMouseEnter={e => e.currentTarget.style.color = theme.text} onMouseLeave={e => e.currentTarget.style.color = theme.textMuted} onClick={() => navigate('/login')}>Sign in</button>
+            <button 
+              onClick={() => navigate('/login')}
+              style={{
+                backgroundColor: theme.text,
+                color: 'white',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              Get Started
+            </button>
+          </div>
+        </nav>
+      </header>
       {/* 1. HERO SECTION */}
       <section style={{ ...sectionStyle, padding: isMobile ? '160px 16px 64px' : '160px 24px 96px', textAlign: 'center', opacity: isVisible ? 1 : 0, transition: 'opacity 0.8s ease' }}>
         <h1 style={{ ...headingStyle, fontSize: isMobile ? '40px' : '64px', maxWidth: '800px', margin: '0 auto 24px' }}>

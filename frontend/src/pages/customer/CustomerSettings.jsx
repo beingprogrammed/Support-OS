@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, Bell, Globe, Moon, Sun, Shield, Camera, Save, Eye, EyeOff, Trash2, LogOut, ChevronRight, Check, AlertTriangle } from 'lucide-react';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -17,6 +17,18 @@ const CustomerSettings = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [errors, setErrors] = useState({});
+    const [avatarSrc, setAvatarSrc] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setAvatarSrc(url);
+            notification.success('Avatar updated successfully!');
+        }
+    };
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -25,11 +37,11 @@ const CustomerSettings = () => {
     }, []);
 
     const [profile, setProfile] = useState({
-        name: user?.name || 'Valued Customer',
-        email: user?.email || 'customer@supportos.com',
-        phone: '+1 (555) 123-4567',
-        company: 'Acme Corp',
-        timezone: 'America/New_York',
+        name: user?.name || 'John Doe',
+        email: user?.email || 'john.doe@example.com',
+        phone: '+1 (415) 555-2671',
+        company: 'TechFlow Solutions',
+        timezone: 'America/Los_Angeles',
         language: 'en',
     });
 
@@ -57,6 +69,22 @@ const CustomerSettings = () => {
     ]);
 
     const handleSave = (section) => {
+        if (section === 'Profile') {
+            const newErrors = {};
+            if (!profile.name.trim()) newErrors.name = 'Full Name is required';
+            if (!profile.email.trim()) newErrors.email = 'Email Address is required';
+            else if (!/^\S+@\S+\.\S+$/.test(profile.email)) newErrors.email = 'Invalid email format';
+            if (!profile.phone.trim()) newErrors.phone = 'Phone Number is required';
+            else if (!/^\+?[\d\s-]{10,}$/.test(profile.phone)) newErrors.phone = 'Invalid phone number format';
+            
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+                notification.error('Please fix the errors in the profile form.');
+                return;
+            }
+            setErrors({});
+        }
+
         setSaving(true);
         setTimeout(() => {
             setSaving(false);
@@ -164,9 +192,9 @@ const CustomerSettings = () => {
                 <h4 style={sectionTitleStyle}>Avatar</h4>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                     <div style={{ position: 'relative' }}>
-                        <Avatar name={profile.name} size="xl" />
+                        <Avatar name={profile.name} size="xl" src={avatarSrc} />
                         <button
-                            onClick={() => notification.info('Avatar upload coming soon!')}
+                            onClick={() => fileInputRef.current.click()}
                             style={{
                                 position: 'absolute', bottom: '-4px', right: '-4px',
                                 width: '32px', height: '32px', borderRadius: '50%',
@@ -180,6 +208,13 @@ const CustomerSettings = () => {
                         >
                             <Camera size={14} />
                         </button>
+                        <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            style={{ display: 'none' }} 
+                            accept="image/*" 
+                            onChange={handleFileChange} 
+                        />
                     </div>
                     <div>
                         <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-bright)' }}>{profile.name}</div>
@@ -193,9 +228,9 @@ const CustomerSettings = () => {
             <div className="glass-card" style={{ padding: isMobile ? '20px' : '32px' }}>
                 <h4 style={sectionTitleStyle}>Personal Information</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
-                    <Input label="Full Name" value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })} icon={User} />
-                    <Input label="Email Address" type="email" value={profile.email} onChange={e => setProfile({ ...profile, email: e.target.value })} />
-                    <Input label="Phone Number" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })} />
+                    <Input label="Full Name" value={profile.name} onChange={e => { setProfile({ ...profile, name: e.target.value }); setErrors({ ...errors, name: null }); }} icon={User} error={errors.name} />
+                    <Input label="Email Address" type="email" value={profile.email} onChange={e => { setProfile({ ...profile, email: e.target.value }); setErrors({ ...errors, email: null }); }} error={errors.email} />
+                    <Input label="Phone Number" value={profile.phone} onChange={e => { setProfile({ ...profile, phone: e.target.value }); setErrors({ ...errors, phone: null }); }} error={errors.phone} />
                     <Input label="Company" value={profile.company} onChange={e => setProfile({ ...profile, company: e.target.value })} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px', marginTop: '4px' }}>

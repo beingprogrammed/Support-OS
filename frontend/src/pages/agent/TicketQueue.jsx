@@ -10,6 +10,7 @@ const TicketQueue = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   const tickets = [
     { id: 'TC-1024', subject: 'Server connection issues in EMEA', customer: { name: 'Sarah Connor' }, status: 'Open', priority: 'High', lastUpdate: '12m ago', messageCount: 4, attachmentCount: 1 },
@@ -27,6 +28,10 @@ const TicketQueue = () => {
                           t.customer.name.toLowerCase().includes(searchQuery.toLowerCase());
     
     return matchesStatus && matchesPriority && matchesSearch;
+  }).sort((a, b) => {
+    // Basic sorting by ID string (e.g. TC-1025 vs TC-1024)
+    if (sortOrder === 'desc') return b.id.localeCompare(a.id);
+    return a.id.localeCompare(b.id);
   });
 
   const containerStyle = {
@@ -68,8 +73,9 @@ const TicketQueue = () => {
           <p style={{ color: 'var(--text)', fontSize: '14px' }}>Manage and respond to incoming support requests.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <Button variant="outline" icon={ArrowUpDown}>Sort</Button>
-          <Button variant="primary">New Ticket</Button>
+          <Button variant="outline" icon={ArrowUpDown} onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}>
+            Sort {sortOrder === 'desc' ? '(Newest)' : '(Oldest)'}
+          </Button>
         </div>
       </div>
 

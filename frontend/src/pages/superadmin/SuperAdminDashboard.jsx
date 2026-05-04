@@ -91,9 +91,6 @@ const SuperAdminDashboard = () => {
           <h1 style={{ color: 'var(--text-bright)', fontSize: '24px', fontWeight: '700' }}>Platform Overview</h1>
           <p style={{ color: 'var(--text)', fontSize: '14px' }}>Real-time metrics across all SupportOS instances.</p>
         </div>
-        <Button variant="primary" icon={Plus} onClick={() => notification.info('Add New Tenant clicked')}>
-          Create New Tenant
-        </Button>
       </div>
 
       <div style={statsGridStyle}>

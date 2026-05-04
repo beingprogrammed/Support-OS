@@ -4,11 +4,17 @@ import { Send, FileText, Tag, Shield, HelpCircle, Upload, X, Paperclip } from 'l
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import useNotification from '../../hooks/useNotification';
+import useAuth from '../../hooks/useAuth';
+import { useTicketContext } from '../../contexts/TicketContext';
 
 const TicketForm = () => {
   const navigate = useNavigate();
   const notification = useNotification();
+  const { addTicket } = useTicketContext();
+  const { user } = useAuth();
   const fileInputRef = useRef(null);
+  
+  const basePath = user?.role === 'agent' ? '/agent/queue' : '/customer';
   
   const [formData, setFormData] = useState({
     subject: '',
@@ -31,8 +37,9 @@ const TicketForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    notification.success('Your ticket has been submitted! We will get back to you soon.');
-    navigate('/customer');
+    addTicket(formData);
+    notification.success('Your ticket has been submitted!');
+    navigate(basePath);
   };
 
   const labelStyle = {
@@ -167,7 +174,7 @@ const TicketForm = () => {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '12px' }}>
-            <Button variant="ghost" onClick={() => navigate('/customer')}>Cancel</Button>
+            <Button variant="ghost" onClick={() => navigate(basePath)}>Cancel</Button>
             <Button type="submit" variant="primary" icon={Send}>Submit Ticket</Button>
           </div>
         </form>

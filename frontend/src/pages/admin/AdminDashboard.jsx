@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, Users, Ticket, Settings, ArrowUpRight, TrendingUp, Clock, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -175,7 +177,7 @@ const AdminDashboard = () => {
         <div className="glass-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '700' }}>Top Performing Agents</h3>
-            <button onClick={() => console.log('View all agents')} style={{ color: 'var(--accent)', fontSize: '13px', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}>View All</button>
+            <button onClick={() => navigate('/admin/agents')} style={{ color: 'var(--accent)', fontSize: '13px', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}>View All</button>
           </div>
           <div>
             {[

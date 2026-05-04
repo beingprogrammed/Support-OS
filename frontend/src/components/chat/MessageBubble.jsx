@@ -1,6 +1,7 @@
 import React from 'react';
+import { FileText } from 'lucide-react';
 
-const MessageBubble = ({ text, sender, timestamp }) => {
+const MessageBubble = ({ text, sender, timestamp, attachment }) => {
   const isAgent = sender === 'agent';
 
   const containerStyle = {
@@ -30,10 +31,30 @@ const MessageBubble = ({ text, sender, timestamp }) => {
     display: 'block',
   };
 
+  const attachmentStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px',
+    backgroundColor: isAgent ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+    borderRadius: '8px',
+    marginBottom: text ? '8px' : '0',
+    fontSize: '13px',
+    fontWeight: '500'
+  };
+
   return (
     <div style={containerStyle}>
       <div style={bubbleStyle}>
-        {text}
+        {attachment && (
+          <div style={attachmentStyle}>
+            <FileText size={18} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {attachment.name}
+            </span>
+          </div>
+        )}
+        {text && <div>{text}</div>}
         <span style={timeStyle}>{timestamp}</span>
       </div>
     </div>

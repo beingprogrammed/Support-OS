@@ -99,7 +99,6 @@ const Sidebar = ({ isMobileOpen, closeSidebar }) => {
         return [
           { path: '/agent', label: 'Dashboard', icon: LayoutDashboard },
           { path: '/agent/queue', label: 'Ticket Queue', icon: Ticket },
-          { path: '/agent/profile', label: 'My Profile', icon: User },
         ];
       case 'admin':
         return [

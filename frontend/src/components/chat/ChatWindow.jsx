@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, Smile, MoreVertical, Phone, Video } from 'lucide-react';
+import { Send, Sparkles, Smile, MoreVertical, Phone, Video, X } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import AttachmentUploader from './AttachmentUploader';
@@ -13,7 +13,11 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
     { id: 3, text: "It's #SO-99281.", sender: 'customer', timestamp: '10:05 AM' },
   ]);
   const [inputText, setInputText] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
+  const emojiPickerRef = useRef(null);
+
+  const emojis = ['😊', '😂', '👍', '🙏', '🔥', '✨', '👋', '💯', '🤔', '🙌', '🎉', '💡'];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,19 +27,44 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleSendMessage = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!inputText.trim()) return;
 
     const newMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: inputText,
-      sender: 'agent', // Assuming the current user is the agent
+      sender: 'customer', // In the customer route, sender is 'customer'
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages([...messages, newMessage]);
     setInputText('');
+  };
+
+  const handleFileSelect = (file) => {
+    const newMessage = {
+      id: Date.now(),
+      sender: 'customer',
+      attachment: file,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages([...messages, newMessage]);
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setInputText(prev => prev + emoji);
+    setShowEmojiPicker(false);
   };
 
   const containerStyle = {
@@ -62,13 +91,14 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
     flexGrow: 1,
     padding: '24px',
     overflowY: 'auto',
-    backgroundColor: '#f8fafc', // Subtle light background for the chat area
+    backgroundColor: '#f8fafc',
   };
 
   const inputAreaStyle = {
     padding: '16px 24px',
     borderTop: '1px solid var(--border)',
     backgroundColor: '#ffffff',
+    position: 'relative'
   };
 
   const aiBoxStyle = {
@@ -82,8 +112,32 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
     gap: '8px',
   };
 
+  const emojiPickerStyle = {
+    position: 'absolute',
+    bottom: '80px',
+    left: '24px',
+    backgroundColor: 'white',
+    border: '1px solid var(--border)',
+    borderRadius: '12px',
+    padding: '12px',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '8px',
+    boxShadow: 'var(--shadow-lg)',
+    zIndex: 1000,
+    animation: 'fadeIn 0.2s ease-out'
+  };
+
   return (
     <div style={containerStyle}>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
       {/* Header */}
       <div style={headerStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -111,6 +165,31 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
 
       {/* Footer */}
       <div style={inputAreaStyle}>
+        {/* Emoji Picker Popover */}
+        {showEmojiPicker && (
+          <div style={emojiPickerStyle} ref={emojiPickerRef}>
+            {emojis.map(emoji => (
+              <button
+                key={emoji}
+                onClick={() => handleEmojiSelect(emoji)}
+                style={{
+                  fontSize: '24px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '8px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* AI Suggested Reply */}
         <div style={aiBoxStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent)', fontWeight: '700', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -127,8 +206,14 @@ const ChatWindow = ({ contactName = 'John Doe', status = 'Online' }) => {
 
         {/* Input Field */}
         <form onSubmit={handleSendMessage} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <AttachmentUploader onFileSelect={(file) => console.log('File selected:', file)} />
-          <Button variant="ghost" size="small"><Smile size={20} /></Button>
+          <AttachmentUploader onFileSelect={handleFileSelect} />
+          <Button 
+            variant="ghost" 
+            size="small" 
+            onClick={(e) => { e.preventDefault(); setShowEmojiPicker(!showEmojiPicker); }}
+          >
+            <Smile size={20} />
+          </Button>
           <div style={{ flexGrow: 1, position: 'relative' }}>
             <input
               type="text"

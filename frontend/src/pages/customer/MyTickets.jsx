@@ -6,42 +6,14 @@ import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Avatar from '../../components/common/Avatar';
 import useNotification from '../../hooks/useNotification';
+import { useTicketContext } from '../../contexts/TicketContext';
 
 const MyTickets = () => {
   const navigate = useNavigate();
   const notification = useNotification();
+  const { tickets } = useTicketContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-
-  const tickets = [
-    {
-      id: 'TC-1024',
-      subject: 'Unable to access dashboard',
-      status: 'Open',
-      priority: 'High',
-      updatedAt: '12 mins ago',
-      category: 'Technical Support',
-      agent: { name: 'Sarah Wilson' }
-    },
-    {
-      id: 'TC-1025',
-      subject: 'Billing inquiry - invoice #882',
-      status: 'Pending',
-      priority: 'Medium',
-      updatedAt: '2 hours ago',
-      category: 'Billing',
-      agent: { name: 'Sarah Wilson' }
-    },
-    {
-      id: 'TC-1026',
-      subject: 'Feature request: Dark mode export',
-      status: 'Resolved',
-      priority: 'Low',
-      updatedAt: '1 day ago',
-      category: 'Feature Request',
-      agent: null
-    }
-  ];
 
   const filteredTickets = tickets.filter(t => {
     const matchesSearch = t.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
