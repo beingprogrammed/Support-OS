@@ -16,7 +16,7 @@ import ChatWidget from './pages/customer/ChatWidget';
 import TicketForm from './pages/customer/TicketForm';
 import MyTickets from './pages/customer/MyTickets';
 import CustomerSettings from './pages/customer/CustomerSettings';
-import CustomerNotifications from './pages/customer/CustomerNotification';
+import Notifications from './pages/Notifications';
 
 // Agent Pages
 import AgentDashboard from './pages/agent/AgentDashboard';
@@ -61,7 +61,7 @@ function App() {
             <Route path="chat" element={<ChatWidget />} />
             <Route path="new-ticket" element={<TicketForm />} />
             <Route path="settings" element={<CustomerSettings />} />
-            <Route path="notifications" element={<CustomerNotifications />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* Protected Agent Routes */}
@@ -70,6 +70,7 @@ function App() {
             <Route path="queue" element={<TicketQueue />} />
             <Route path="ticket/:id" element={<TicketDetail />} />
             <Route path="profile" element={<AgentProfile />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* Protected Admin Routes */}
@@ -79,6 +80,7 @@ function App() {
             <Route path="analytics" element={<Analytics />} />
             <Route path="faq" element={<FAQManager />} />
             <Route path="settings" element={<BusinessSettings />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* Protected SuperAdmin Routes */}
@@ -86,6 +88,7 @@ function App() {
             <Route index element={<SuperAdminDashboard />} />
             <Route path="tenants" element={<TenantList />} />
             <Route path="settings" element={<SuperAdminSettings />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* 404 Catch-All Route */}

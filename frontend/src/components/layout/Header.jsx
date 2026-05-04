@@ -166,7 +166,15 @@ const Header = ({ title, toggleSidebar }) => {
               ))}
             </div>
             <div style={{ padding: '12px', textAlign: 'center', borderTop: '1px solid var(--border)' }}>
-              <button style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer' }}>View All Activity</button>
+              <button 
+                onClick={() => {
+                  setShowNotifications(false);
+                  navigate(`/${user?.role}/notifications`);
+                }}
+                style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                View All Activity
+              </button>
             </div>
           </div>
         </div>

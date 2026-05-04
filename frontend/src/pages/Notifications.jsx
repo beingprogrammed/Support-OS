@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Bell, MessageSquare, Zap, Shield, AlertCircle, Clock, Check, CheckCheck, Trash2, Filter, Search, Archive, MailOpen } from 'lucide-react';
-import Button from '../../components/common/Button';
-import Badge from '../../components/common/Badge';
-import useNotification from '../../hooks/useNotification';
+import { Bell, MessageSquare, Zap, Shield, AlertCircle, Clock, Check, CheckCheck, Trash2, Filter, Search, Archive, MailOpen, Activity } from 'lucide-react';
+import Button from '../components/common/Button';
+import Badge from '../components/common/Badge';
+import useNotification from '../hooks/useNotification';
+import useAuth from '../hooks/useAuth';
 
-const CustomerNotifications = () => {
+const Notifications = () => {
+    const { user } = useAuth();
     const notification = useNotification();
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -80,7 +82,7 @@ const CustomerNotifications = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-                        <h2 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-bright)' }}>Notifications</h2>
+                        <h2 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-bright)' }}>Notifications & Activity</h2>
                         {unreadCount > 0 && (
                             <span style={{
                                 padding: '4px 12px', borderRadius: '20px',
@@ -92,7 +94,7 @@ const CustomerNotifications = () => {
                             </span>
                         )}
                     </div>
-                    <p style={{ color: 'var(--text)', fontSize: '15px' }}>Stay up to date with your support activity.</p>
+                    <p style={{ color: 'var(--text)', fontSize: '15px' }}>Stay up to date with your platform activity and system alerts.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <Button variant="outline" icon={CheckCheck} size="small" onClick={markAllRead}>Mark All Read</Button>
@@ -152,7 +154,7 @@ const CustomerNotifications = () => {
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
                                     borderLeft: !n.read ? '3px solid var(--accent)' : '3px solid transparent',
-                                    backgroundColor: !n.read ? 'var(--surface)' : 'var(--surface)',
+                                    backgroundColor: 'var(--surface)',
                                     opacity: n.read ? 0.75 : 1,
                                 }}
                                 onMouseOver={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.opacity = '1'; }}
@@ -229,6 +231,4 @@ const CustomerNotifications = () => {
     );
 };
 
-export default CustomerNotifications;
-
-
+export default Notifications;
