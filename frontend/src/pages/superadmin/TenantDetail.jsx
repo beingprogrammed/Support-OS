@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Building2, Mail, Globe, Calendar, CreditCard, Shield, MapPin, ExternalLink, Database, Users, ArrowLeft, MoreHorizontal, AlertTriangle } from 'lucide-react';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import useNotification from '../../hooks/useNotification';
 
 const TenantDetail = () => {
+  const navigate = useNavigate();
   const notification = useNotification();
   const tenant = {
     name: 'Acme Corp',
@@ -23,7 +25,7 @@ const TenantDetail = () => {
   };
 
   const handleBack = () => {
-    notification.info('Navigating back to Tenant List');
+    navigate('/superadmin/tenants');
   };
 
   const handleEdit = () => {
@@ -114,7 +116,7 @@ const TenantDetail = () => {
         <div className="glass-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '600' }}>Recent Activity</h3>
-            <Button variant="ghost" size="small" icon={ExternalLink} onClick={() => notification.info('View full audit log')}>Full Log</Button>
+            <Button variant="ghost" size="small" icon={ExternalLink} onClick={() => navigate('/superadmin/notifications')}>Full Log</Button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[

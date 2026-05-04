@@ -140,7 +140,14 @@ const AgentDashboard = () => {
               </div>
             ))}
           </div>
-          <Button variant="outline" fullWidth style={{ marginTop: '24px' }}>View Full Audit Log</Button>
+          <Button 
+            variant="outline" 
+            fullWidth 
+            style={{ marginTop: '24px' }}
+            onClick={() => navigate('/agent/notifications')}
+          >
+            View Full Audit Log
+          </Button>
         </div>
       </div>
     </div>

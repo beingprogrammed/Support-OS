@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Building2, Users, Database, Globe, ArrowUpRight, ArrowDownRight, Server, Activity, ShieldCheck, Zap, Plus, ExternalLink, MoreVertical, Palette } from 'lucide-react';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
@@ -6,6 +7,7 @@ import useNotification from '../../hooks/useNotification';
 import ThemeSelector from '../../components/common/ThemeSelector';
 
 const SuperAdminDashboard = () => {
+  const navigate = useNavigate();
   const notification = useNotification();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -137,7 +139,7 @@ const SuperAdminDashboard = () => {
           <div className="glass-card" style={{ padding: '24px' }}>
              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                <h3 style={{ color: 'var(--text-bright)', fontSize: '18px', fontWeight: '600' }}>Recent Tenants</h3>
-               <Button variant="ghost" size="small" onClick={() => notification.info('View All Tenants')}>View All</Button>
+               <Button variant="ghost" size="small" onClick={() => navigate('/superadmin/tenants')}>View All</Button>
              </div>
              <div style={{ overflowX: 'auto' }}>
                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -225,7 +227,7 @@ const SuperAdminDashboard = () => {
                 </div>
               ))}
             </div>
-            <Button variant="outline" fullWidth size="small" style={{ marginTop: '20px' }} onClick={() => notification.info('View All Logs')}>
+            <Button variant="outline" fullWidth size="small" style={{ marginTop: '20px' }} onClick={() => navigate('/superadmin/notifications')}>
               View All Security Logs
             </Button>
           </div>
