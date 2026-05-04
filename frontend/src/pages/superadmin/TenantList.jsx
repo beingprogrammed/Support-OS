@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Plus, Search, ExternalLink, ShieldCheck, Users, Filter, MoreVertical, Globe, Shield, CreditCard, Mail } from 'lucide-react';
+import { Building2, Plus, Search, ExternalLink, ShieldCheck, Users, Filter, MoreVertical, Globe, Shield, CreditCard, Mail, Zap } from 'lucide-react';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Input from '../../components/common/Input';
@@ -189,7 +189,7 @@ const TenantList = () => {
                       </div>
                     </td>
                     <td style={{ padding: '16px' }}>
-                      <Badge variant={tenant.plan === 'Enterprise' ? 'primary' : 'outline'}>{tenant.plan}</Badge>
+                      <Badge variant={tenant.plan === 'Enterprise' ? 'info' : tenant.plan === 'Pro' ? 'warning' : 'default'}>{tenant.plan}</Badge>
                     </td>
                     <td style={{ padding: '16px' }}>
                       <Badge variant={tenant.status === 'active' ? 'success' : 'error'}>
@@ -279,8 +279,8 @@ const TenantList = () => {
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)', paddingLeft: '4px' }}>Subscription Plan</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              {['Pro', 'Enterprise'].map(p => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              {['Free', 'Pro', 'Enterprise'].map(p => (
                 <div 
                   key={p}
                   onClick={() => setNewTenant({...newTenant, plan: p})}
@@ -295,7 +295,7 @@ const TenantList = () => {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px', color: newTenant.plan === p ? 'var(--accent)' : 'var(--text)' }}>
-                    {p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
+                    {p === 'Free' ? <Zap size={20} /> : p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: newTenant.plan === p ? 'var(--accent)' : 'var(--text-bright)' }}>{p}</div>
                 </div>
@@ -334,8 +334,8 @@ const TenantList = () => {
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-bright)', paddingLeft: '4px' }}>Subscription Plan</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              {['Pro', 'Enterprise'].map(p => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              {['Free', 'Pro', 'Enterprise'].map(p => (
                 <div 
                   key={p}
                   onClick={() => setEditTenant({...editTenant, plan: p})}
@@ -350,7 +350,7 @@ const TenantList = () => {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px', color: editTenant.plan === p ? 'var(--accent)' : 'var(--text)' }}>
-                    {p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
+                    {p === 'Free' ? <Zap size={20} /> : p === 'Pro' ? <CreditCard size={20} /> : <Shield size={20} />}
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: editTenant.plan === p ? 'var(--accent)' : 'var(--text-bright)' }}>{p}</div>
                 </div>
